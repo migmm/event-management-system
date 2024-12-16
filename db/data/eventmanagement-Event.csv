@@ -1,0 +1,31 @@
+ID,Name,StartDate,EndDate,Location,Description,IsActive,IsCancelled,CancellationReason
+1,Technology Conference 2024,2024-03-07,2024-08-14,Berlin,"A forum on data science innovations, methodologies, and real-world applications.",True,True,Member set.
+2,Marketing Summit 2024,2024-07-02,2024-02-19,San Francisco,A summit dedicated to the world of e-commerce and online retail technologies.,True,False,
+3,AI Symposium 2024,2024-08-17,2024-08-09,Barcelona,An expo focused on VR and AR development and its applications across industries.,True,False,
+4,Healthcare Summit 2024,2024-02-02,2024-06-08,New York,The global summit on innovations in healthcare and the latest medical trends.,True,False,Environmental.
+5,Blockchain Expo 2024,2024-07-07,2024-02-26,Berlin,"An expo on cybersecurity trends, technologies, and best practices.",True,True,Turn quality.
+6,Digital Transformation Forum,2024-10-04,2024-01-26,Sydney,An expo dedicated to automotive technologies and the future of transportation.,True,False,
+7,Innovation Summit 2024,2024-02-03,2024-10-23,San Diego,An expo focused on VR and AR development and its applications across industries.,True,True,
+8,International Business Conference,2024-10-28,2024-04-12,Boston,A comprehensive expo on blockchain technology and its potential applications.,True,True,
+9,Retail Expo 2024,2024-10-12,2024-06-30,Toronto,An international conference on smart cities and urban innovation.,True,True,Set boy.
+10,Finance and Investment Conference,2024-04-08,2024-05-23,San Francisco,A summit discussing the future of work and remote collaboration technologies.,True,True,
+11,E-Commerce Summit 2024,2024-08-16,2024-03-18,Chicago,The annual conference bringing together tech enthusiasts and industry leaders.,True,False,Reduce join prevent.
+12,Cybersecurity Expo 2024,2024-09-08,2024-11-03,Boston,An expo focused on VR and AR development and its applications across industries.,True,True,Morning military.
+13,Data Science Forum 2024,2024-02-23,2024-07-15,Rome,A summit dedicated to the world of e-commerce and online retail technologies.,True,True,
+14,Smart Cities Conference,2024-09-05,2024-11-19,Sydney,A comprehensive expo on blockchain technology and its potential applications.,True,False,Employee common land.
+15,Sustainability Summit 2024,2024-11-10,2024-02-18,Dubai,An expo on AI and robotics technologies and their applications in various sectors.,True,True,Late that raise.
+16,Cloud Computing Symposium,2024-11-27,2024-06-16,Los Angeles,A gathering of innovators to share cutting-edge developments and trends.,True,True,Foot most discussion.
+17,VR/AR Technology Expo,2024-09-09,2024-01-19,Tokyo,A gathering of innovators to share cutting-edge developments and trends.,True,True,
+18,Global Entrepreneurship Summit,2024-04-19,2024-10-21,Tokyo,"A conference for creative professionals in design, marketing, and technology.",True,False,
+19,International HR Forum,2024-11-13,2024-03-17,Barcelona,A conference on media and entertainment technologies and the future of digital content.,True,True,Kid box possible major.
+20,Smart Manufacturing Summit,2024-08-20,2024-03-11,Boston,A summit promoting entrepreneurship and new business ventures worldwide.,True,True,Organization.
+21,Creative Design Conference,2024-01-29,2024-04-02,New York,The annual conference bringing together tech enthusiasts and industry leaders.,True,True,
+22,Global Tech Forum,2024-02-04,2024-12-06,Sydney,A symposium discussing cloud computing innovations and digital infrastructure.,True,False,
+23,AI and Robotics Expo,2024-04-27,2024-01-13,New York,A summit focusing on the future of marketing and digital strategies.,True,False,
+24,Future of Work Summit,2024-04-03,2024-08-04,Singapore,A gathering of innovators to share cutting-edge developments and trends.,True,True,
+25,Tech Innovations 2024,2024-11-06,2024-09-15,Boston,A summit discussing the future of work and remote collaboration technologies.,True,False,
+26,Virtual Reality Development Expo,2024-01-08,2024-03-10,Vancouver,An expo focused on VR and AR development and its applications across industries.,True,True,Your.
+27,Big Data and Analytics Conference,2024-09-17,2024-03-01,Berlin,A symposium exploring the impact of AI and its role in modern industries.,True,True,
+28,Mobile Development Summit,2024-03-24,2024-06-29,Rome,A conference on modern manufacturing technologies and smart manufacturing.,True,True,
+29,Automotive Tech Expo,2024-10-31,2024-02-18,Austin,An expo on AI and robotics technologies and their applications in various sectors.,True,False,
+30,Media and Entertainment Conference,2024-12-11,2024-11-24,Dubai,A summit focused on energy innovations and sustainable solutions for the future.,True,True,Chair together side.
