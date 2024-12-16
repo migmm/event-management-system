@@ -6,10 +6,13 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "@cap-js/hana": "^1",
+    "@sap-cloud-sdk/http-client": "^3.24.0",
+    "@sap-cloud-sdk/resilience": "^3.24.0",
     "@sap/cds": "^8",
-    "express": "^4",
     "@sap/xssec": "^4",
-    "@cap-js/hana": "^1"
+    "axios": "^1.7.9",
+    "express": "^4"
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.7.0",
@@ -21,8 +24,21 @@
   },
   "cds": {
     "requires": {
-      "auth": "xsuaa",
-      "connectivity": true
+      "auth": "mocked",
+      "connectivity": true,
+      "API_BUSINESS_PARTNER": {
+        "kind": "odata-v2",
+        "model": "srv/external/API_BUSINESS_PARTNER",
+        "credentials": {
+          "url": "<The url is provided by the .env file>",
+          "authentication": "BasicAuthentication",
+          "username": "<The username is provided by the .env file>",
+          "password": "<The password is provided by the .env file>",
+          "headers": {
+            "Accept": "application/json"
+          }
+        }
+      }
     },
     "sql": {
       "native_hana_associations": false
