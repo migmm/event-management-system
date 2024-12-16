@@ -1,0 +1,110 @@
+######################################################
+####         EVENT MANAGEMENT API TESTING         ####
+######################################################
+
+
+### Base URL
+@api_base_url = http://localhost:4004/odata/v4/events-tickets/
+
+
+
+##############
+### EVENTS ###
+##############
+
+### 1. Get all events
+GET http://localhost:4004/odata/v4/management/Events
+Accept: application/json
+
+### 2. Create a new event
+POST http://localhost:4004/odata/v4/management/Events
+Content-Type: application/json
+
+{
+  "Name": "Tech Conference 2024",
+  "StartDate": "2024-07-01",
+  "EndDate": "2024-07-03",
+  "Location": "New York City",
+  "Description": "Annual Technology Conference",
+  "IsActive": true,
+  "IsCancelled": false,
+  "CancellationReason": null
+}
+
+### 3. Update an event
+PATCH http://localhost:4004/odata/v4/management/Events(1)
+Content-Type: application/json
+
+{
+  "Description": "Updated description for Tech Conference 2024"
+}
+
+### 4. Delete an event
+DELETE http://localhost:4004/odata/v4/management/Events(1)
+
+
+
+####################
+### PARTICIPANTS ###
+####################
+
+### 5. Get all participants
+GET http://localhost:4004/odata/v4/management/Participants
+Accept: application/json
+
+###
+### 6. Create a participant
+POST http://localhost:4004/odata/v4/management/Participants
+Content-Type: application/json
+
+{
+  "FirstName": "John",
+  "LastName": "Doe",
+  "Email": "johndoe@example.com",
+  "Phone": "123456789",
+  "BusinessPartnerID": "BP123456"
+}
+
+### 7. Update a participant (BusinessPartnerID cannot be changed)
+PATCH http://localhost:4004/odata/v4/management/Participants(1)
+Content-Type: application/json
+
+{
+  "Phone": "987654321"
+}
+
+### 8. Delete a participant
+DELETE http://localhost:4004/odata/v4/management/Participants(100)
+
+
+
+####################
+### CUSTOM LOGIC ###
+####################
+
+
+### 9. Register a participant for an event
+POST http://localhost:4004/odata/v4/management/registerParticipant
+Content-Type: application/json
+
+{
+  "eventID": 1,
+  "participantID": 1
+}
+
+### 10. Cancel an event
+POST http://localhost:4004/odata/v4/management/cancelEvent
+Content-Type: application/json
+
+{
+  "eventID": 1,
+  "reason": "Weather conditions"
+}
+
+### 11. Reopen an event
+POST http://localhost:4004/odata/v4/management/reopenEvent
+Content-Type: application/json
+
+{
+  "eventID": 1
+}
