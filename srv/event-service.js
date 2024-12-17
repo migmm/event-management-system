@@ -74,6 +74,38 @@ module.exports = cds.service.impl(async function () {
         return true;
     });
 
+    /**
+    * getEventParticipants:
+    * This action retrieves participants for a specific event. It checks if the event exists,
+    * is active, and is not cancelled. If the event is valid, it returns the participants.
+    * Otherwise, it returns an empty array.
+    */
+
+    this.on('getEventParticipants', async (req) => {
+        const { eventID } = req.data;
+
+        // Query the event from the database
+        const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
+
+        // Check if the event exists, is active, and is not cancelled
+        if (event.length === 0 || event[0].IsCancelled || !event[0].IsActive) {
+            console.log(`Event with ID ${eventID} not found, cancelled, or inactive.`);
+            return []; // Return an empty array if the event is invalid
+        }
+
+        // Log the event details for debugging purposes
+        console.log('Event found:', event[0]);
+
+        // Retrieve the participants associated with the event
+        // Make sure to use 'Event_ID' (without space) instead of 'Event ID'
+        const participants = await SELECT.from(Participants).where({ Event_ID: eventID });
+
+        // Log the participants details for debugging purposes
+        console.log(`Found ${participants.length} participants for event with ID ${eventID}.`);
+
+        // Return the list of participants
+        return participants;
+    });
 
 
     /*
