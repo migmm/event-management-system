@@ -64,4 +64,44 @@ module.exports = cds.service.impl(async function () {
         console.log(`Event with ID ${eventID} has been cancelled.`);
         return true;
     });
+
+    /*
+     * reopenEvent:
+     * This action reopens a previously cancelled event by setting IsCancelled to false,
+     * IsActive to true, and clearing the CancellationReason. If the event doesn't exist 
+     * or isn't cancelled, it returns false.
+     */
+    this.on('reopenEvent', async (req) => {
+        const { eventID } = req.data;
+
+        // Limit the results to 1 and fetch the event
+        const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
+
+        // Check if the event doesn't exist or isn't cancelled
+        if (event.length === 0 || !event[0].IsCancelled) {
+            console.log(`Event with ID ${eventID} not found or not cancelled.`);
+            return false;
+        }
+
+        // Log the event data for debugging purposes
+        console.log('Event found:', event[0]);
+
+        // Perform the update to reopen the event
+        const result = await UPDATE(Events)
+            .set({
+                IsCancelled: false,
+                IsActive: true,
+                CancellationReason: null
+            })
+            .where({ ID: eventID });
+
+        // Check if the update was successful (no rows updated)
+        if (result === 0) {
+            console.log(`Failed to reopen event with ID ${eventID}.`);
+            return false;
+        }
+
+        console.log(`Event with ID ${eventID} has been reopened.`);
+        return true;
+    });
 });
