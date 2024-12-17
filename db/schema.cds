@@ -21,7 +21,7 @@ entity Participant : managed {
         FirstName         : String(100);
         LastName          : String(100);
         Email             : String(150);
-        Phone             : String(15);
+        Phone             : String(50);
         BusinessPartnerID : String(50);
         Event             : Association to Event;
 }
