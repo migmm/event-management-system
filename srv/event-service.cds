@@ -10,4 +10,7 @@ service ManagementService {
     action registerParticipant(eventID : Integer, participantID : Integer) returns Boolean;
     action cancelEvent(eventID : Integer, reason : String)                 returns Boolean;
     action reopenEvent(eventID : Integer)                                  returns Boolean;
+
+    function getEventParticipants(eventID: Integer) returns array of Participants;
+
 }
