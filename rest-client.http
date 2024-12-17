@@ -62,7 +62,7 @@ Content-Type: application/json
   "LastName": "Doe",
   "Email": "johndoe@example.com",
   "Phone": "123456789",
-  "BusinessPartnerID": "BP123456"
+  "BusinessPartnerID": "ee"
 }
 
 ### 7. Update a participant (BusinessPartnerID cannot be changed)
@@ -74,7 +74,7 @@ Content-Type: application/json
 }
 
 ### 8. Delete a participant
-DELETE http://localhost:4004/odata/v4/management/Participants(100)
+DELETE http://localhost:4004/odata/v4/management/Participants(1)
 
 
 
@@ -88,8 +88,8 @@ POST http://localhost:4004/odata/v4/management/registerParticipant
 Content-Type: application/json
 
 {
-  "eventID": 1,
-  "participantID": 1
+  "eventID": 2,
+  "participantID": 2
 }
 
 ### 10. Cancel an event
@@ -97,7 +97,7 @@ POST http://localhost:4004/odata/v4/management/cancelEvent
 Content-Type: application/json
 
 {
-  "eventID": 1,
+  "eventID": 2,
   "reason": "Weather conditions"
 }
 
@@ -106,5 +106,9 @@ POST http://localhost:4004/odata/v4/management/reopenEvent
 Content-Type: application/json
 
 {
-  "eventID": 1
+  "eventID": 2
 }
+
+### 12. Retrieve participants for a specific event
+GET http://localhost:4004/odata/v4/Management/getEventParticipants(eventID=2)
+Accept: application/json
