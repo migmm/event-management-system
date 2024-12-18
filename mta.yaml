@@ -28,6 +28,7 @@ modules:
       - name: event-management-system-auth
       - name: event-management-system-db
       - name: event-management-system-connectivity
+      - name: event-management-system-destination
 
   - name: event-management-system-db-deployer
     type: hdb
@@ -52,6 +53,7 @@ modules:
           url: ~{srv-url}
           forwardAuthToken: true
       - name: event-management-system-auth
+      - name: event-management-system-destination
 
 resources:
   - name: event-management-system-auth
@@ -72,4 +74,9 @@ resources:
     type: org.cloudfoundry.managed-service
     parameters:
       service: connectivity
+      service-plan: lite
+  - name: event-management-system-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
       service-plan: lite

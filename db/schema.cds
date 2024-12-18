@@ -1,5 +1,5 @@
 using { managed } from '@sap/cds/common';
-
+using apibusinesspartner from './external/API_BUSINESS_PARTNER';
 namespace eventmanagement;
 
 entity Event : managed {
@@ -21,7 +21,9 @@ entity Participant : managed {
         FirstName         : String(100);
         LastName          : String(100);
         Email             : String(150);
-        Phone             : String(15);
+        Phone             : String(50);
         BusinessPartnerID : String(50);
         Event             : Association to Event;
+        BusinessPartner   : Association to apibusinesspartner.A_BusinessPartner
+                             on BusinessPartner.BusinessPartner = $self.BusinessPartnerID;
 }
