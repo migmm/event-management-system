@@ -95,47 +95,78 @@ module.exports = cds.service.impl(async function () {
     */
     this.on('registerParticipant', async (req) => {
         const { eventID, participantID } = req.data;
-
+    
         // Validate event exists, is active, and is not cancelled
         const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
-
+    
         // Check if the event exists and is active
         if (event.length === 0 || event[0].IsCancelled || !event[0].IsActive) {
             console.log(`Event with ID ${eventID} not found, cancelled, or inactive.`);
-            return false;
+            return {
+                status: 'error',
+                code: 404,
+                message: `Event with ID ${eventID} not found, is cancelled, or inactive.`
+            };
         }
-
+    
         // Log the event data for debugging purposes
         console.log('Event found:', event[0]);
-
+    
         // Validate the participant exists and has a valid BusinessPartnerID
         const participant = await SELECT.from(Participants).where({ ID: participantID }).limit(1);
-
+    
         // Check if the participant exists and has a valid BusinessPartnerID
         if (participant.length === 0 || !participant[0].BusinessPartnerID) {
             console.log(`Participant with ID ${participantID} not found or missing BusinessPartnerID.`);
-            return false;
+            return {
+                status: 'error',
+                code: 404,
+                message: `Participant with ID ${participantID} not found or missing BusinessPartnerID.`
+            };
         }
-
+    
         // Log the participant data for debugging purposes
         console.log('Participant found:', participant[0]);
-
+    
+        // Check if the participant is already registered for the event
+        const existingRegistration = await SELECT.from(Participants)
+            .where({ ID: participantID, Event: { ID: eventID } })
+            .limit(1);
+    
+        // If the participant is already registered for the event, return an error
+        if (existingRegistration.length > 0) {
+            console.log(`Participant with ID ${participantID} is already registered for event with ID ${eventID}.`);
+            return {
+                status: 'error',
+                code: 400,
+                message: `Participant with ID ${participantID} is already registered for event with ID ${eventID}.`
+            };
+        }
+    
         // Register the participant for the event by updating the participant's Event association
-        // Note: Ensure the participant's Event ID is correctly updated
         const result = await UPDATE(Participants)
             .set({ Event: { ID: eventID } }) // Correctly associating the participant with the event
             .where({ ID: participantID });
-
+    
         // Verify if the participant registration was successful
         if (result === 0) {
             console.log(`Failed to register participant with ID ${participantID} for event with ID ${eventID}.`);
-            return false;
+            return {
+                status: 'error',
+                code: 500,
+                message: `Failed to register participant with ID ${participantID} for event with ID ${eventID}.`
+            };
         }
-
+    
         console.log(`Participant with ID ${participantID} has been successfully registered for event with ID ${eventID}.`);
-        return true;
+        return {
+            status: 'success',
+            code: 200,
+            message: `Participant with ID ${participantID} has been successfully registered for event with ID ${eventID}.`
+        };
     });
-
+    
+    
 
     this.on('fetchParticipantDetails', async (req) => {
         const { ParticipantID } = req.data;
