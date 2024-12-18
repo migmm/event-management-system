@@ -8,6 +8,7 @@ module.exports = cds.service.impl(async function () {
         BusinessPartners
     } = this.entities;
 
+
     /*
      * Custom logic to get a new ID before creating a record in the Events or Participants table.
      * The function `getNextId` is called to determine the next available ID for the respective table.
@@ -18,7 +19,7 @@ module.exports = cds.service.impl(async function () {
         const newID = await getNextId(tableName); // Get the next available ID for the Events table
         req.data.ID = newID;
     });
-
+    
     this.before('CREATE', 'Participants', async (req) => {
         const tableName = req.target.name;
         const newID = await getNextId(tableName); // Get the next available ID for the Participants table
@@ -74,14 +75,49 @@ module.exports = cds.service.impl(async function () {
         return true;
     });
 
-    /**
+
+
+    this.on('fetchParticipantDetails', async (req) => {
+        const { ParticipantID } = req.data;
+        if (!ParticipantID) {
+            req.reject(400, "ParticipantID is required");
+        }
+
+        try {
+            const participant = await SELECT.one.from(Participants).where({ ID: ParticipantID });
+            if (!participant) {
+                req.reject(404, `Participant with ID ${ParticipantID} not found`);
+            }
+
+            let businessPartnerData = null;
+            if (participant.BusinessPartnerID) {
+                try {
+                    businessPartnerData = await bpService.run(
+                        SELECT.one.from(BusinessPartners).where({ BusinessPartner: participant.BusinessPartnerID })
+                    );
+                } catch (error) {
+                    console.error(`Error fetching Business Partner data:`, error);
+                }
+            }
+
+            return {
+                ...participant,
+                BusinessPartnerData: businessPartnerData || null
+            };
+
+        } catch (error) {
+            console.error("Error in fetchParticipantDetails:", error);
+            req.reject(500, "An unexpected error occurred");
+        }
+    });
+
+        /**
     * getEventParticipants:
     * This action retrieves participants for a specific event. It checks if the event exists,
     * is active, and is not cancelled. If the event is valid, it returns the participants.
     * Otherwise, it returns an empty array.
     */
-
-    this.on('getEventParticipants', async (req) => {
+       this.on('getEventParticipants', async (req) => {
         const { eventID } = req.data;
 
         // Query the event from the database
