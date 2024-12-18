@@ -8,8 +8,41 @@ module.exports = cds.service.impl(async function () {
         BusinessPartners
     } = this.entities;
 
+
+    this.before('CREATE', 'Participants', async (req) => {
+        const { BusinessPartner, FirstName, LastName, Email, Phone } = req.data;
+        const tableName = req.target.name;
+        const newID = await getNextId(tableName);
+        req.data.ID = newID;
+    
+        
+        if (!BusinessPartnerID) req.reject(400, 'BusinessPartnerID is required.');
+        const bpExists = await bpService.run(
+            SELECT.one.from('API_BUSINESS_PARTNER.A_BusinessPartner')
+                .where({ BusinessPartner: BusinessPartnerID })
+        );
+        if (!bpExists) req.reject(404, `Business Partner with ID ${BusinessPartnerID} does not exist.`);
+    
+        if (!FirstName || !LastName || !Email || !Phone) {
+            req.reject(400, 'FirstName, LastName, Email, and Phone are required.');
+        } 
+    });
+    
+     this.after('CREATE', 'Participants', async (data, req) => {
+        
+        const createdParticipant = await SELECT.one.from(Participants).where({ ID: req.data.ID });
+        
+        console.log('Retrieved created participant:', createdParticipant);
+    
+        if (createdParticipant) {
+            return createdParticipant; 
+        } else {
+            req.reject(500, 'Failed to retrieve the created participant.');
+        }
+    });
+    
+    
     // Custom READ handler for Participants to include Business Partner details
-    // --- Obtener participantes con datos de Business Partner ---
     this.on('READ', 'Participants', async (req) => {
         try {
             
