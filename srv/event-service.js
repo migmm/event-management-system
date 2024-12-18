@@ -40,19 +40,6 @@ module.exports = cds.service.impl(async function () {
         }
     });
 
-    this.after('CREATE', 'Participants', async (data, req) => {
-
-        const createdParticipant = await SELECT.one.from(Participants).where({ ID: req.data.ID });
-
-        console.log('Retrieved created participant:', createdParticipant);
-
-        if (createdParticipant) {
-            return createdParticipant;
-        } else {
-            req.reject(500, 'Failed to retrieve the created participant.');
-        }
-    });
-
 
     /*
      * Custom logic to get a new ID before creating a record in the Events or Participants table.
