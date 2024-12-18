@@ -52,7 +52,6 @@ DELETE http://localhost:4004/odata/v4/management/Events(1)
 GET http://localhost:4004/odata/v4/management/Participants
 Accept: application/json
 
-###
 ### 6. Create a participant
 POST http://localhost:4004/odata/v4/management/Participants
 Content-Type: application/json
@@ -62,7 +61,7 @@ Content-Type: application/json
   "LastName": "Doe",
   "Email": "johndoe@example.com",
   "Phone": "123456789",
-  "BusinessPartnerID": "ee"
+  "BusinessPartnerID": "1000000"
 }
 
 ### 7. Update a participant (BusinessPartnerID cannot be changed)
@@ -74,13 +73,17 @@ Content-Type: application/json
 }
 
 ### 8. Delete a participant
-DELETE http://localhost:4004/odata/v4/management/Participants(1)
+DELETE http://localhost:4004/odata/v4/management/Participants(2)
 
 
 
 ####################
 ### CUSTOM LOGIC ###
 ####################
+
+### 8. Fetch Participant Details
+GET http://localhost:4004/odata/v4/management/fetchParticipantDetails(ParticipantID=7)
+Accept: application/json
 
 
 ### 9. Register a participant for an event
