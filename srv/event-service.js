@@ -8,6 +8,49 @@ module.exports = cds.service.impl(async function () {
         BusinessPartners
     } = this.entities;
 
+    // Custom READ handler for Participants to include Business Partner details
+    // --- Obtener participantes con datos de Business Partner ---
+    this.on('READ', 'Participants', async (req) => {
+        try {
+            
+            const participants = await SELECT.from(Participants);
+            console.log("Participants fetched:", participants);
+
+            
+            const participantsArray = Array.isArray(participants) ? participants : [participants];
+
+           
+            const enrichedParticipants = await Promise.all(participantsArray.map(async (participant) => {
+                if (participant.BusinessPartner) {
+                    try {
+                        
+                        const bpData = await bpService.run(
+                            SELECT.one.from(BusinessPartners).where({ BusinessPartner: participant.BusinessPartnerID })
+                        );
+
+                        return {
+                            ...participant,
+                            BusinessPartnerData: bpData || null
+                        };
+                    } catch (error) {
+                        console.error(`Error fetching Business Partner data for ID ${participant.BusinessPartnerID}:`, error);
+                        return {
+                            ...participant,
+                            BusinessPartnerData: null
+                        };
+                    }
+                }
+                return participant;
+            }));
+
+            console.log("Enriched Participants:", enrichedParticipants);
+            return enrichedParticipants;
+
+        } catch (error) {
+            console.error("Error fetching Participants with Business Partner data:", error);
+            throw error;
+        }
+    });
 
     /*
      * Custom logic to get a new ID before creating a record in the Events or Participants table.
@@ -75,7 +118,7 @@ module.exports = cds.service.impl(async function () {
         return true;
     });
 
-
+  
 
     this.on('fetchParticipantDetails', async (req) => {
         const { ParticipantID } = req.data;
@@ -111,13 +154,13 @@ module.exports = cds.service.impl(async function () {
         }
     });
 
-        /**
+      /**
     * getEventParticipants:
     * This action retrieves participants for a specific event. It checks if the event exists,
     * is active, and is not cancelled. If the event is valid, it returns the participants.
     * Otherwise, it returns an empty array.
     */
-       this.on('getEventParticipants', async (req) => {
+    this.on('getEventParticipants', async (req) => {
         const { eventID } = req.data;
 
         // Query the event from the database
