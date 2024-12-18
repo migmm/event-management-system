@@ -10,6 +10,7 @@ module.exports = cds.service.impl(async function () {
 
     const bpService = await cds.connect.to('API_BUSINESS_PARTNER');
 
+
     console.log('Destination details:', bpService.options)
     this.on('READ', 'BusinessPartners', async (req) => {
         try {
@@ -19,6 +20,7 @@ module.exports = cds.service.impl(async function () {
             throw error;
         }
     });
+
 
     this.before('CREATE', 'Participants', async (req) => {
         const { BusinessPartnerID, FirstName, LastName, Email, Phone } = req.data;
@@ -32,67 +34,25 @@ module.exports = cds.service.impl(async function () {
                 .where({ BusinessPartner: BusinessPartnerID })
         );
         if (!bpExists) req.reject(404, `Business Partner with ID ${BusinessPartnerID} does not exist.`);
-    
+
         if (!FirstName || !LastName || !Email || !Phone) {
             req.reject(400, 'FirstName, LastName, Email, and Phone are required.');
-        } 
-    });
-    
-     this.after('CREATE', 'Participants', async (data, req) => {
-        
-        const createdParticipant = await SELECT.one.from(Participants).where({ ID: req.data.ID });
-        
-        console.log('Retrieved created participant:', createdParticipant);
-    
-        if (createdParticipant) {
-            return createdParticipant; 
-        } else {
-            req.reject(500, 'Failed to retrieve the created participant.');
-        } 
-    });
-    
-    // Custom READ handler for Participants to include Business Partner details
-    this.on('READ', 'Participants', async (req) => {
-        try {
-            
-            const participants = await SELECT.from(Participants);
-            console.log("Participants fetched:", participants);
-
-            
-            const participantsArray = Array.isArray(participants) ? participants : [participants];
-
-           
-            const enrichedParticipants = await Promise.all(participantsArray.map(async (participant) => {
-                if (participant.BusinessPartner) {
-                    try {
-                        
-                        const bpData = await bpService.run(
-                            SELECT.one.from(BusinessPartners).where({ BusinessPartner: participant.BusinessPartnerID })
-                        );
-
-                        return {
-                            ...participant,
-                            BusinessPartnerData: bpData || null
-                        };
-                    } catch (error) {
-                        console.error(`Error fetching Business Partner data for ID ${participant.BusinessPartnerID}:`, error);
-                        return {
-                            ...participant,
-                            BusinessPartnerData: null
-                        };
-                    }
-                }
-                return participant;
-            }));
-
-            console.log("Enriched Participants:", enrichedParticipants);
-            return enrichedParticipants;
-
-        } catch (error) {
-            console.error("Error fetching Participants with Business Partner data:", error);
-            throw error;
         }
     });
+
+    this.after('CREATE', 'Participants', async (data, req) => {
+
+        const createdParticipant = await SELECT.one.from(Participants).where({ ID: req.data.ID });
+
+        console.log('Retrieved created participant:', createdParticipant);
+
+        if (createdParticipant) {
+            return createdParticipant;
+        } else {
+            req.reject(500, 'Failed to retrieve the created participant.');
+        }
+    });
+
 
     /*
      * Custom logic to get a new ID before creating a record in the Events or Participants table.
@@ -104,12 +64,28 @@ module.exports = cds.service.impl(async function () {
         const newID = await getNextId(tableName); // Get the next available ID for the Events table
         req.data.ID = newID;
     });
-    
+
     this.before('CREATE', 'Participants', async (req) => {
         const tableName = req.target.name;
         const newID = await getNextId(tableName); // Get the next available ID for the Participants table
         req.data.ID = newID;
     });
+
+    
+    this.before('UPDATE', 'Participants', async (req) => {
+        const { ID, BusinessPartnerID } = req.data;
+
+        const originalParticipant = await SELECT.one.from(Participants).where({ ID });
+
+        if (!originalParticipant) {
+            req.reject(404, `Participant with ID ${ID} not found.`);
+        }
+
+        if (originalParticipant.BusinessPartnerID !== BusinessPartnerID) {
+            req.reject(400, 'BusinessPartnerID cannot be changed once set.');
+        }
+    });
+
 
     /*
     * registerParticipant:
@@ -160,24 +136,23 @@ module.exports = cds.service.impl(async function () {
         return true;
     });
 
-  
 
     this.on('fetchParticipantDetails', async (req) => {
         const { ParticipantID } = req.data;
-    
+
         if (!ParticipantID) {
             req.reject(400, "ParticipantID is required");
         }
-    
+
         try {
             // Fetch the participant data
             const participant = await SELECT.one.from(Participants).where({ ID: ParticipantID });
             if (!participant) {
                 req.reject(404, `Participant with ID ${ParticipantID} not found`);
             }
-    
+
             let businessPartnerData = null;
-    
+
             // Fetch Business Partner data if BusinessPartnerID exists
             if (participant.BusinessPartnerID) {
                 try {
@@ -188,7 +163,7 @@ module.exports = cds.service.impl(async function () {
                     console.error(`Error fetching Business Partner data:`, error);
                 }
             }
-    
+
             // Customize the return structure:
             // Merge BusinessPartnerData into BusinessPartnerID and remove the association
             const result = {
@@ -196,22 +171,22 @@ module.exports = cds.service.impl(async function () {
                 BusinessPartnerID: businessPartnerData || null
             };
             delete result.BusinessPartner; // Remove the association
-    
+
             return result;
-    
+
         } catch (error) {
             console.error("Error in fetchParticipantDetails:", error);
             req.reject(500, "An unexpected error occurred");
         }
     });
-    
 
-      /**
-    * getEventParticipants:
-    * This action retrieves participants for a specific event. It checks if the event exists,
-    * is active, and is not cancelled. If the event is valid, it returns the participants.
-    * Otherwise, it returns an empty array.
-    */
+
+    /**
+  * getEventParticipants:
+  * This action retrieves participants for a specific event. It checks if the event exists,
+  * is active, and is not cancelled. If the event is valid, it returns the participants.
+  * Otherwise, it returns an empty array.
+  */
     this.on('getEventParticipants', async (req) => {
         const { eventID } = req.data;
 
@@ -278,6 +253,7 @@ module.exports = cds.service.impl(async function () {
         console.log(`Event with ID ${eventID} has been cancelled.`);
         return true;
     });
+
 
     /*
      * reopenEvent:
