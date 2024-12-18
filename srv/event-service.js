@@ -9,13 +9,24 @@ module.exports = cds.service.impl(async function () {
     } = this.entities;
 
 
+    const bpService = await cds.connect.to('API_BUSINESS_PARTNER');
+
+    this.on('READ', 'BusinessPartners', async (req) => {
+        try {
+            return await bpService.run(req.query);
+        } catch (error) {
+            console.error('Error fetching Business Partners:', error);
+            throw error;
+        }
+    });
+
     this.before('CREATE', 'Participants', async (req) => {
         const { BusinessPartner, FirstName, LastName, Email, Phone } = req.data;
         const tableName = req.target.name;
         const newID = await getNextId(tableName);
         req.data.ID = newID;
     
-        
+
         if (!BusinessPartnerID) req.reject(400, 'BusinessPartnerID is required.');
         const bpExists = await bpService.run(
             SELECT.one.from('API_BUSINESS_PARTNER.A_BusinessPartner')
