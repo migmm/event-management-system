@@ -1,5 +1,16 @@
 const cds = require('@sap/cds');
 const { getNextId } = require('./utils/getNextId');
+const {
+    validateParticipantFields,
+    validateEventDates,
+    validateEmailAndPhone,
+    validateBusinessPartnerID,
+    validateEventStatus,
+    validateEventExists,
+    validateParticipantExists,
+    validateEventCancellation,
+    validateEventReopening
+} = require('./utils/validations');
 
 module.exports = cds.service.impl(async function () {
     const {
@@ -34,16 +45,13 @@ module.exports = cds.service.impl(async function () {
         const newID = await getNextId(tableName);
         req.data.ID = newID;
 
-        if (!BusinessPartnerID) req.reject(400, 'BusinessPartnerID is required.');
+        validateParticipantFields(req, req.data);
+
         const bpExists = await bpService.run(
             SELECT.one.from('API_BUSINESS_PARTNER.A_BusinessPartner')
                 .where({ BusinessPartner: BusinessPartnerID })
         );
         if (!bpExists) req.reject(404, `Business Partner with ID ${BusinessPartnerID} does not exist.`);
-
-        if (!FirstName || !LastName || !Email || !Phone) {
-            req.reject(400, 'FirstName, LastName, Email, and Phone are required.');
-        }
     });
 
     /** 
@@ -55,9 +63,8 @@ module.exports = cds.service.impl(async function () {
         const newID = await getNextId(tableName);
         req.data.ID = newID;
         const { StartDate, EndDate } = req.data;
-        if (StartDate > EndDate) {
-            req.error(400, 'StartDate cannot be after EndDate');
-        }
+
+        validateEventDates(req, StartDate, EndDate);
     });
 
     /** 
@@ -72,16 +79,7 @@ module.exports = cds.service.impl(async function () {
         const email = req.data.Email;
         const phone = req.data.Phone;
 
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        const phoneRegex = /^\+?[0-9]*$/;
-
-        if (email && !emailRegex.test(email)) {
-            req.error(400, 'Invalid email format');
-        }
-
-        if (phone && !phoneRegex.test(phone)) {
-            req.error(400, 'Invalid phone number format');
-        }
+        validateEmailAndPhone(req, email, phone);
 
         const existingParticipant = await SELECT.one.from(Participants).where({ Email: email });
 
@@ -103,23 +101,12 @@ module.exports = cds.service.impl(async function () {
             req.reject(404, `Participant with ID ${ID} not found.`);
         }
 
-        if (originalParticipant.BusinessPartnerID !== BusinessPartnerID) {
-            req.reject(400, 'BusinessPartnerID cannot be changed once set.');
-        }
+        validateBusinessPartnerID(req, originalParticipant.BusinessPartnerID, BusinessPartnerID);
 
         const email = req.data.Email;
         const phone = req.data.Phone;
 
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        const phoneRegex = /^\+?[0-9]*$/;
-
-        if (email && !emailRegex.test(email)) {
-            req.error(400, 'Invalid email format');
-        }
-
-        if (phone && !phoneRegex.test(phone)) {
-            req.error(400, 'Invalid phone number format');
-        }
+        validateEmailAndPhone(req, email, phone);
     });
 
     /** 
@@ -132,34 +119,22 @@ module.exports = cds.service.impl(async function () {
         // Validate event exists, is active, and is not cancelled
         const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
 
-        // Check if the event exists and is active
-        if (event.length === 0 || event[0].IsCancelled || !event[0].IsActive) {
-            console.log(`Event with ID ${eventID} not found, cancelled, or inactive.`);
+        if (!validateEventStatus(req, event)) {
             return false;
         }
-
-        // Log the event data for debugging purposes
-        console.log('Event found:', event[0]);
 
         // Validate the participant exists and has a valid BusinessPartnerID
         const participant = await SELECT.from(Participants).where({ ID: participantID }).limit(1);
 
-        // Check if the participant exists and has a valid BusinessPartnerID
-        if (participant.length === 0 || !participant[0].BusinessPartnerID) {
-            console.log(`Participant with ID ${participantID} not found or missing BusinessPartnerID.`);
+        if (!validateParticipantExists(req, participant)) {
             return false;
         }
 
-        // Log the participant data for debugging purposes
-        console.log('Participant found:', participant[0]);
-
         // Register the participant for the event by updating the participant's Event association
-        // Note: Ensure the participant's Event ID is correctly updated
         const result = await UPDATE(Participants)
-            .set({ Event: { ID: eventID } }) // Correctly associating the participant with the event
+            .set({ Event: { ID: eventID } })
             .where({ ID: participantID });
 
-        // Verify if the participant registration was successful
         if (result === 0) {
             console.log(`Failed to register participant with ID ${participantID} for event with ID ${eventID}.`);
             return false;
@@ -167,72 +142,6 @@ module.exports = cds.service.impl(async function () {
 
         console.log(`Participant with ID ${participantID} has been successfully registered for event with ID ${eventID}.`);
         return true;
-    });
-    
-    /** 
-     * Action to fetch participant details.
-     * Returns the participant's information along with Business Partner data if available.
-     */
-    this.on('fetchParticipantDetails', async (req) => {
-        const { ParticipantID } = req.data;
-
-        if (!ParticipantID) {
-            req.reject(400, "ParticipantID is required");
-        }
-
-        try {
-            const participant = await SELECT.one.from(Participants).where({ ID: ParticipantID });
-            if (!participant) {
-                req.reject(404, `Participant with ID ${ParticipantID} not found`);
-            }
-
-            let businessPartnerData = null;
-
-            if (participant.BusinessPartnerID) {
-                try {
-                    businessPartnerData = await bpService.run(
-                        SELECT.one.from(BusinessPartners).where({ BusinessPartner: participant.BusinessPartnerID })
-                    );
-                } catch (error) {
-                    console.error(`Error fetching Business Partner data:`, error);
-                }
-            }
-
-            const result = {
-                ...participant,
-                BusinessPartnerID: businessPartnerData || null
-            };
-            delete result.BusinessPartner;
-
-            return result;
-
-        } catch (error) {
-            console.error("Error in fetchParticipantDetails:", error);
-            req.reject(500, "An unexpected error occurred");
-        }
-    });
-
-    /** 
-     * Action to retrieve participants for a specific event.
-     * Returns participants associated with the event if valid.
-     */
-    this.on('getEventParticipants', async (req) => {
-        const { eventID } = req.data;
-
-        const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
-
-        if (event.length === 0 || event[0].IsCancelled || !event[0].IsActive) {
-            console.log(`Event with ID ${eventID} not found, cancelled, or inactive.`);
-            return [];
-        }
-
-        console.log('Event found:', event[0]);
-
-        const participants = await SELECT.from(Participants).where({ Event_ID: eventID });
-
-        console.log(`Found ${participants.length} participants for event with ID ${eventID}.`);
-
-        return participants;
     });
 
     /** 
@@ -244,16 +153,10 @@ module.exports = cds.service.impl(async function () {
 
         const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
 
-        if (event.length === 0) {
-            console.log(`Event with ID ${eventID} not found.`);
-            return {
-                status: 'error',
-                code: 404,
-                message: `Event with ID ${eventID} not found.`
-            };
+        const validationResult = validateEventCancellation(req, event, reason);
+        if (validationResult.status === 'error') {
+            return validationResult;
         }
-
-        console.log('Event found:', event[0]);
 
         const result = await UPDATE(Events)
             .set({
@@ -289,16 +192,10 @@ module.exports = cds.service.impl(async function () {
 
         const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
 
-        if (event.length === 0 || !event[0].IsCancelled) {
-            console.log(`Event with ID ${eventID} not found or not cancelled.`);
-            return {
-                status: 'error',
-                code: 404,
-                message: `Event with ID ${eventID} not found or not cancelled.`
-            };
+        const validationResult = validateEventReopening(req, event);
+        if (validationResult.status === 'error') {
+            return validationResult;
         }
-
-        console.log('Event found:', event[0]);
 
         const result = await UPDATE(Events)
             .set({
@@ -331,8 +228,6 @@ module.exports = cds.service.impl(async function () {
      */
     this.before('UPDATE', 'Event', async (req) => {
         const { StartDate, EndDate } = req.data;
-        if (StartDate > EndDate) {
-            req.error(400, 'StartDate cannot be after EndDate');
-        }
+        validateEventDates(req, StartDate, EndDate);
     });
 });
