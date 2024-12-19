@@ -4,7 +4,7 @@
 
 
 ### Base URL and port
-@port=4004
+@port=37391
 
 ### Local test
 @api_base_url = http://localhost:{{port}}/odata/v4/management/
@@ -183,4 +183,93 @@ Content-Type: application/json
 
 {
   "eventID": 2
+}
+
+
+########################################
+###      Extra data for adding       ###
+########################################
+
+### Participants
+###
+POST {{api_base_url}}Participants
+Content-Type: application/json
+
+{
+  "FirstName": "Linda",
+  "LastName": "Johnson",
+  "Email": "linda.johnson@email.com",
+  "Phone": "902709987",
+  "BusinessPartnerID": "1000000"
+}
+
+###
+POST {{api_base_url}}Participants
+Content-Type: application/json
+
+{
+  "FirstName": "Michael",
+  "LastName": "Jones",
+  "Email": "michael.jones@email.com",
+  "Phone": "813039790",
+  "BusinessPartnerID": "1000000"
+}
+
+###
+POST {{api_base_url}}Participants
+Content-Type: application/json
+
+{
+  "FirstName": "John",
+  "LastName": "Wilson",
+  "Email": "james.wilson@email.com",
+  "Phone": "698292056",
+  "BusinessPartnerID": "1000000"
+}
+
+
+### Events
+###
+POST {{api_base_url}}Events
+Content-Type: application/json
+
+{
+  "Name": "Marketing Summit",
+  "StartDate": "2024-07-01",
+  "EndDate": "2024-07-03",
+  "Location": "San Francisco",
+  "Description": "A summit dedicated to the world of e-commerce",
+  "IsActive": true,
+  "IsCancelled": false,
+  "CancellationReason": null
+}
+
+###
+POST {{api_base_url}}Events
+Content-Type: application/json
+
+{
+  "Name": "International HR Forum",
+  "StartDate": "2024-07-01",
+  "EndDate": "2024-07-03",
+  "Location": "Barcelona",
+  "Description": "A conference on media and entertainment technologies",
+  "IsActive": true,
+  "IsCancelled": false,
+  "CancellationReason": null
+}
+
+###
+POST {{api_base_url}}Events
+Content-Type: application/json
+
+{
+  "Name": "Virtual Reality Development Expo",
+  "StartDate": "2024-07-01",
+  "EndDate": "2024-07-03",
+  "Location": "Vancouver",
+  "Description": "An expo focused on VR and AR development",
+  "IsActive": true,
+  "IsCancelled": false,
+  "CancellationReason": null
 }
