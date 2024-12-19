@@ -6,17 +6,17 @@ const {
     validateEmailAndPhone,
     validateBusinessPartnerID,
     validateEventStatus,
-    validateEventExists,
     validateParticipantExists,
     validateEventCancellation,
     validateEventReopening
 } = require('./utils/validations');
+const { getErrorMessage } = require('./utils/errorMessages');
+const { getSuccessMessage } = require('./utils/successMessages');
 
 module.exports = cds.service.impl(async function () {
     const {
         Events,  // Event entity
         Participants,  // Participant entity
-        BusinessPartners  // Business Partner entity
     } = this.entities;
 
     const bpService = await cds.connect.to('API_BUSINESS_PARTNER');
@@ -120,14 +120,14 @@ module.exports = cds.service.impl(async function () {
         const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
 
         if (!validateEventStatus(req, event)) {
-            return false;
+            return getErrorMessage(404, `Event with ID ${eventID} not found, cancelled, or inactive.`);
         }
 
         // Validate the participant exists and has a valid BusinessPartnerID
         const participant = await SELECT.from(Participants).where({ ID: participantID }).limit(1);
 
         if (!validateParticipantExists(req, participant)) {
-            return false;
+            return getErrorMessage(404, `Participant with ID ${participantID} not found or missing BusinessPartnerID.`);
         }
 
         // Register the participant for the event by updating the participant's Event association
@@ -137,11 +137,11 @@ module.exports = cds.service.impl(async function () {
 
         if (result === 0) {
             console.log(`Failed to register participant with ID ${participantID} for event with ID ${eventID}.`);
-            return false;
+            return getErrorMessage(500, `Failed to register participant with ID ${participantID} for event with ID ${eventID}.`);
         }
 
         console.log(`Participant with ID ${participantID} has been successfully registered for event with ID ${eventID}.`);
-        return true;
+        return getSuccessMessage(200, `Participant with ID ${participantID} has been successfully registered for event with ID ${eventID}.`);
     });
 
     /** 
@@ -168,19 +168,11 @@ module.exports = cds.service.impl(async function () {
 
         if (result === 0) {
             console.log(`Failed to update event with ID ${eventID}.`);
-            return {
-                status: 'error',
-                code: 500,
-                message: `Failed to update event with ID ${eventID}.`
-            };
+            return getErrorMessage(500, `Failed to update event with ID ${eventID}.`);
         }
 
         console.log(`Event with ID ${eventID} has been cancelled.`);
-        return {
-            status: 'success',
-            code: 200,
-            message: `Event with ID ${eventID} has been cancelled.`
-        };
+        return getSuccessMessage(200, `Event with ID ${eventID} has been cancelled.`);
     });
 
     /** 
@@ -207,19 +199,11 @@ module.exports = cds.service.impl(async function () {
 
         if (result === 0) {
             console.log(`Failed to reopen event with ID ${eventID}.`);
-            return {
-                status: 'error',
-                code: 500,
-                message: `Failed to reopen event with ID ${eventID}.`
-            };
+            return getErrorMessage(500, `Failed to reopen event with ID ${eventID}.`);
         }
 
         console.log(`Event with ID ${eventID} has been reopened.`);
-        return {
-            status: 'success',
-            code: 200,
-            message: `Event with ID ${eventID} has been reopened.`
-        };
+        return getSuccessMessage(200, `Event with ID ${eventID} has been reopened.`);
     });
 
     /** 
