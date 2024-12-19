@@ -1,5 +1,3 @@
-// utils/validationUtils.js
-
 module.exports = {
     validateParticipantFields,
     validateEventDates,
