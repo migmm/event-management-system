@@ -79,7 +79,7 @@ Content-Type: application/json
 }
 
 ### Delete a participant
-DELETE {{api_base_url}}Participants(37)
+DELETE {{api_base_url}}Participants(1)
 
 
 
@@ -88,7 +88,7 @@ DELETE {{api_base_url}}Participants(37)
 ####################
 
 ### Fetch Participant Details
-GET {{api_base_url}}fetchParticipantDetails(ParticipantID=1)
+GET {{api_base_url}}fetchParticipantDetails(ParticipantID=2)
 Accept: application/json
 
 
@@ -97,7 +97,7 @@ POST {{api_base_url}}registerParticipant
 Content-Type: application/json
 
 {
-  "eventID": 1,
+  "eventID": 2,
   "participantID": 2
 }
 
@@ -119,11 +119,68 @@ Content-Type: application/json
 }
 
 ### Retrieve participants for a specific event
-GET {{api_base_url}}getEventParticipants(eventID=1)
+GET {{api_base_url}}getEventParticipants(eventID=2)
 Accept: application/json
 
 
 
 ########################################
-### Worng information to test errors ###
+### Wrong information to test errors ###
 ########################################
+
+
+### Create a participant with existent email 
+### Use after created a participant before
+POST {{api_base_url}}Participants
+Content-Type: application/json
+
+{
+  "FirstName": "John",
+  "LastName": "Doe",
+  "Email": "johndoe@xample.com",
+  "Phone": "123456789",
+  "BusinessPartnerID": "1000000"
+}
+
+
+### Update a participant changing BusinessPartnerID
+PATCH {{api_base_url}}Participants(1)
+Content-Type: application/json
+
+{
+  "FirstName": "Charles",
+  "LastName": "Doe",
+  "Email": "johndoe@xample.com",
+  "Phone": "123456789",
+  "BusinessPartnerID": "1000200"
+}
+
+### Fetch Participant Details wiht an id that does not exist
+GET {{api_base_url}}fetchParticipantDetails(ParticipantID=1)
+Accept: application/json
+
+### Register a participant for an event that does not exist
+POST {{api_base_url}}registerParticipant
+Content-Type: application/json
+
+{
+  "eventID": 1,
+  "participantID": 2
+}
+
+### Cancel an event tahat does not exist
+POST {{api_base_url}}cancelEvent
+Content-Type: application/json
+
+{
+  "eventID": 2,
+  "reason": "Weather conditions"
+}
+
+### Reopen an event that does not exist
+POST {{api_base_url}}reopenEvent
+Content-Type: application/json
+
+{
+  "eventID": 2
+}
