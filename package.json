@@ -12,7 +12,6 @@
     "@sap/cds": "^8",
     "@sap/cds-hana": "^2.0.0",
     "@sap/xssec": "^4",
-    "axios": "^1.7.9",
     "express": "^4"
   },
   "devDependencies": {
@@ -25,20 +24,17 @@
   },
   "cds": {
     "requires": {
+      "db": {
+        "kind": "hana"
+      },
       "auth": "mocked",
       "connectivity": true,
-      "db": "hana",
       "API_BUSINESS_PARTNER": {
         "kind": "odata-v2",
         "model": "srv/external/API_BUSINESS_PARTNER",
         "credentials": {
-          "url": "<The url is provided by the .env file>",
-          "authentication": "BasicAuthentication",
-          "username": "<The username is provided by the .env file>",
-          "password": "<The password is provided by the .env file>",
-          "headers": {
-            "Accept": "application/json"
-          }
+          "destination": "API_EXT_DESTINATION",
+          "path": "/sap/opu/odata/sap/API_BUSINESS_PARTNER"
         }
       }
     },
