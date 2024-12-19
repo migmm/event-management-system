@@ -9,12 +9,10 @@ entity Event : managed {
     message: 'The name must be between 1 and 255 characters.' }
     Name : String(255);
 
-    @mandatory @assert: { format: 'yyyy-MM-dd', 
-    message: 'The start date must be in yyyy-MM-dd format.' }
+    @mandatory 
     StartDate : Date;
 
-    @mandatory @assert: { format: 'yyyy-MM-dd', 
-    message: 'The end date must be in yyyy-MM-dd format.' }
+    @mandatory 
     EndDate : Date;
 
     @mandatory @assert: { range: { min: 1, max: 255 }, 
