@@ -3,10 +3,7 @@ using API_BUSINESS_PARTNER from './external/API_BUSINESS_PARTNER-service';
 
 service ManagementService {
     entity Events       as projection on eventmanagement.Event;
-    entity Participants as projection on eventmanagement.Participant {
-        *,
-        BusinessPartner
-    };
+    entity Participants as projection on eventmanagement.Participant;
     
     entity BusinessPartners as projection on API_BUSINESS_PARTNER.A_BusinessPartner;
 

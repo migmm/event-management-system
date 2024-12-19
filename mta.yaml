@@ -8,7 +8,7 @@ build-parameters:
   before-all:
     - builder: custom
       commands:
-        - npm ci
+        - npm install
         - npx cds build --production
 modules:
   - name: event-management-system-srv
@@ -25,9 +25,7 @@ modules:
         properties:
           srv-url: ${default-url}
     requires:
-      - name: event-management-system-auth
       - name: event-management-system-db
-      - name: event-management-system-connectivity
       - name: event-management-system-destination
 
   - name: event-management-system-db-deployer
@@ -38,43 +36,12 @@ modules:
     requires:
       - name: event-management-system-db
 
-  - name: event-management-system
-    type: approuter.nodejs
-    path: app/router
-    parameters:
-      keep-existing-routes: true
-      disk-quota: 256M
-      memory: 256M
-    requires:
-      - name: srv-api
-        group: destinations
-        properties:
-          name: srv-api # must be used in xs-app.json as well
-          url: ~{srv-url}
-          forwardAuthToken: true
-      - name: event-management-system-auth
-      - name: event-management-system-destination
-
 resources:
-  - name: event-management-system-auth
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: xsuaa
-      service-plan: application
-      path: ./xs-security.json
-      config:
-        xsappname: event-management-system-${org}-${space}
-        tenant-mode: dedicated
   - name: event-management-system-db
     type: com.sap.xs.hdi-container
     parameters:
       service: hana
       service-plan: hdi-shared
-  - name: event-management-system-connectivity
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: connectivity
-      service-plan: lite
   - name: event-management-system-destination
     type: org.cloudfoundry.managed-service
     parameters:

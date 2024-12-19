@@ -1,16 +1,31 @@
 const cds = require('@sap/cds');
 const { getNextId } = require('./utils/getNextId');
+const {
+    validateParticipantFields,
+    validateEventDates,
+    validateEmailAndPhone,
+    validateBusinessPartnerID,
+    validateEventStatus,
+    validateParticipantExists,
+    validateEventCancellation,
+    validateEventReopening
+} = require('./utils/validations');
+const { getErrorMessage } = require('./utils/errorMessages');
+const { getSuccessMessage } = require('./utils/successMessages');
 
 module.exports = cds.service.impl(async function () {
     const {
-        Events,
-        Participants,
-        BusinessPartners
+        Events,  // Event entity
+        Participants,  // Participant entity
     } = this.entities;
 
-
     const bpService = await cds.connect.to('API_BUSINESS_PARTNER');
+    console.log('Destination details:', bpService.options);
 
+    /** 
+     * Event handler for 'READ' requests on the 'BusinessPartners' entity.
+     * Fetches Business Partners from the connected external API.
+     */
     this.on('READ', 'BusinessPartners', async (req) => {
         try {
             return await bpService.run(req.query);
@@ -20,239 +35,129 @@ module.exports = cds.service.impl(async function () {
         }
     });
 
+    /** 
+     * Event handler before 'CREATE' on 'Participants' entity.
+     * Ensures necessary fields are provided and validates Business Partner existence.
+     */
     this.before('CREATE', 'Participants', async (req) => {
-        const { BusinessPartner, FirstName, LastName, Email, Phone } = req.data;
+        const { BusinessPartnerID, FirstName, LastName, Email, Phone } = req.data;
         const tableName = req.target.name;
         const newID = await getNextId(tableName);
         req.data.ID = newID;
-    
 
-        if (!BusinessPartnerID) req.reject(400, 'BusinessPartnerID is required.');
+        validateParticipantFields(req, req.data);
+
         const bpExists = await bpService.run(
             SELECT.one.from('API_BUSINESS_PARTNER.A_BusinessPartner')
                 .where({ BusinessPartner: BusinessPartnerID })
         );
         if (!bpExists) req.reject(404, `Business Partner with ID ${BusinessPartnerID} does not exist.`);
-    
-        if (!FirstName || !LastName || !Email || !Phone) {
-            req.reject(400, 'FirstName, LastName, Email, and Phone are required.');
-        } 
-    });
-    
-     this.after('CREATE', 'Participants', async (data, req) => {
-        
-        const createdParticipant = await SELECT.one.from(Participants).where({ ID: req.data.ID });
-        
-        console.log('Retrieved created participant:', createdParticipant);
-    
-        if (createdParticipant) {
-            return createdParticipant; 
-        } else {
-            req.reject(500, 'Failed to retrieve the created participant.');
-        }
-    });
-    
-    
-    // Custom READ handler for Participants to include Business Partner details
-    this.on('READ', 'Participants', async (req) => {
-        try {
-            
-            const participants = await SELECT.from(Participants);
-            console.log("Participants fetched:", participants);
-
-            
-            const participantsArray = Array.isArray(participants) ? participants : [participants];
-
-           
-            const enrichedParticipants = await Promise.all(participantsArray.map(async (participant) => {
-                if (participant.BusinessPartner) {
-                    try {
-                        
-                        const bpData = await bpService.run(
-                            SELECT.one.from(BusinessPartners).where({ BusinessPartner: participant.BusinessPartnerID })
-                        );
-
-                        return {
-                            ...participant,
-                            BusinessPartnerData: bpData || null
-                        };
-                    } catch (error) {
-                        console.error(`Error fetching Business Partner data for ID ${participant.BusinessPartnerID}:`, error);
-                        return {
-                            ...participant,
-                            BusinessPartnerData: null
-                        };
-                    }
-                }
-                return participant;
-            }));
-
-            console.log("Enriched Participants:", enrichedParticipants);
-            return enrichedParticipants;
-
-        } catch (error) {
-            console.error("Error fetching Participants with Business Partner data:", error);
-            throw error;
-        }
     });
 
-    /*
-     * Custom logic to get a new ID before creating a record in the Events or Participants table.
-     * The function `getNextId` is called to determine the next available ID for the respective table.
+    /** 
+     * Event handler before 'CREATE' on the 'Events' entity.
+     * Ensures that the event's StartDate is not after EndDate.
      */
-
     this.before('CREATE', 'Events', async (req) => {
         const tableName = req.target.name;
-        const newID = await getNextId(tableName); // Get the next available ID for the Events table
+        const newID = await getNextId(tableName);
         req.data.ID = newID;
-    });
-    
-    this.before('CREATE', 'Participants', async (req) => {
-        const tableName = req.target.name;
-        const newID = await getNextId(tableName); // Get the next available ID for the Participants table
-        req.data.ID = newID;
+        const { StartDate, EndDate } = req.data;
+
+        validateEventDates(req, StartDate, EndDate);
     });
 
-    /*
-    * registerParticipant:
-    * This action registers a participant for an event. It checks if the event is active
-    * and not cancelled. It also verifies that the participant exists and has a valid
-    * BusinessPartnerID. If any validation fails, it returns false.
-    */
+    /** 
+     * Event handler before 'CREATE' on the 'Participants' entity.
+     * Validates email and phone number format, and checks for duplicate emails.
+     */
+    this.before('CREATE', 'Participants', async (req) => {
+        const tableName = req.target.name;
+        const newID = await getNextId(tableName);
+        req.data.ID = newID;
+
+        const email = req.data.Email;
+        const phone = req.data.Phone;
+
+        validateEmailAndPhone(req, email, phone);
+
+        const existingParticipant = await SELECT.one.from(Participants).where({ Email: email });
+
+        if (existingParticipant) {
+            req.error(400, 'Email already exists');
+        }
+    });
+
+    /** 
+     * Event handler before 'UPDATE' on 'Participants' entity.
+     * Ensures that BusinessPartnerID cannot be changed, and validates email and phone format.
+     */
+    this.before('UPDATE', 'Participants', async (req) => {
+        const { ID, BusinessPartnerID } = req.data;
+
+        const originalParticipant = await SELECT.one.from(Participants).where({ ID });
+
+        if (!originalParticipant) {
+            req.reject(404, `Participant with ID ${ID} not found.`);
+        }
+
+        validateBusinessPartnerID(req, originalParticipant.BusinessPartnerID, BusinessPartnerID);
+
+        const email = req.data.Email;
+        const phone = req.data.Phone;
+
+        validateEmailAndPhone(req, email, phone);
+    });
+
+    /** 
+     * Action to register a participant for an event.
+     * Verifies if the event is active, and checks if the participant exists.
+     */
     this.on('registerParticipant', async (req) => {
         const { eventID, participantID } = req.data;
 
         // Validate event exists, is active, and is not cancelled
         const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
 
-        // Check if the event exists and is active
-        if (event.length === 0 || event[0].IsCancelled || !event[0].IsActive) {
-            console.log(`Event with ID ${eventID} not found, cancelled, or inactive.`);
-            return false;
+        if (!validateEventStatus(req, event)) {
+            return getErrorMessage(404, `Event with ID ${eventID} not found, cancelled, or inactive.`);
         }
-
-        // Log the event data for debugging purposes
-        console.log('Event found:', event[0]);
 
         // Validate the participant exists and has a valid BusinessPartnerID
         const participant = await SELECT.from(Participants).where({ ID: participantID }).limit(1);
 
-        // Check if the participant exists and has a valid BusinessPartnerID
-        if (participant.length === 0 || !participant[0].BusinessPartnerID) {
-            console.log(`Participant with ID ${participantID} not found or missing BusinessPartnerID.`);
-            return false;
+        if (!validateParticipantExists(req, participant)) {
+            return getErrorMessage(404, `Participant with ID ${participantID} not found or missing BusinessPartnerID.`);
         }
 
-        // Log the participant data for debugging purposes
-        console.log('Participant found:', participant[0]);
-
         // Register the participant for the event by updating the participant's Event association
-        // Note: Ensure the participant's Event ID is correctly updated
         const result = await UPDATE(Participants)
-            .set({ Event: { ID: eventID } }) // Correctly associating the participant with the event
+            .set({ Event: { ID: eventID } })
             .where({ ID: participantID });
 
-        // Verify if the participant registration was successful
         if (result === 0) {
             console.log(`Failed to register participant with ID ${participantID} for event with ID ${eventID}.`);
-            return false;
+            return getErrorMessage(500, `Failed to register participant with ID ${participantID} for event with ID ${eventID}.`);
         }
 
         console.log(`Participant with ID ${participantID} has been successfully registered for event with ID ${eventID}.`);
-        return true;
+        return getSuccessMessage(200, `Participant with ID ${participantID} has been successfully registered for event with ID ${eventID}.`);
     });
 
-  
-
-    this.on('fetchParticipantDetails', async (req) => {
-        const { ParticipantID } = req.data;
-        if (!ParticipantID) {
-            req.reject(400, "ParticipantID is required");
-        }
-
-        try {
-            const participant = await SELECT.one.from(Participants).where({ ID: ParticipantID });
-            if (!participant) {
-                req.reject(404, `Participant with ID ${ParticipantID} not found`);
-            }
-
-            let businessPartnerData = null;
-            if (participant.BusinessPartnerID) {
-                try {
-                    businessPartnerData = await bpService.run(
-                        SELECT.one.from(BusinessPartners).where({ BusinessPartner: participant.BusinessPartnerID })
-                    );
-                } catch (error) {
-                    console.error(`Error fetching Business Partner data:`, error);
-                }
-            }
-
-            return {
-                ...participant,
-                BusinessPartnerData: businessPartnerData || null
-            };
-
-        } catch (error) {
-            console.error("Error in fetchParticipantDetails:", error);
-            req.reject(500, "An unexpected error occurred");
-        }
-    });
-
-      /**
-    * getEventParticipants:
-    * This action retrieves participants for a specific event. It checks if the event exists,
-    * is active, and is not cancelled. If the event is valid, it returns the participants.
-    * Otherwise, it returns an empty array.
-    */
-    this.on('getEventParticipants', async (req) => {
-        const { eventID } = req.data;
-
-        // Query the event from the database
-        const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
-
-        // Check if the event exists, is active, and is not cancelled
-        if (event.length === 0 || event[0].IsCancelled || !event[0].IsActive) {
-            console.log(`Event with ID ${eventID} not found, cancelled, or inactive.`);
-            return []; // Return an empty array if the event is invalid
-        }
-
-        // Log the event details for debugging purposes
-        console.log('Event found:', event[0]);
-
-        // Retrieve the participants associated with the event
-        // Make sure to use 'Event_ID' (without space) instead of 'Event ID'
-        const participants = await SELECT.from(Participants).where({ Event_ID: eventID });
-
-        // Log the participants details for debugging purposes
-        console.log(`Found ${participants.length} participants for event with ID ${eventID}.`);
-
-        // Return the list of participants
-        return participants;
-    });
-
-
-    /*
-     * cancelEvent:
-     * This action cancels an event by marking it as cancelled (IsCancelled = true),
-     * deactivating it (IsActive = false), and storing the reason for cancellation
-     * (CancellationReason). If the event doesn't exist, it returns false. 
+    /** 
+     * Action to cancel an event.
+     * Marks the event as cancelled and stores the reason for cancellation.
      */
     this.on('cancelEvent', async (req) => {
         const { eventID, reason } = req.data;
 
-        // Limit the results to 1 and fetch the event
         const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
 
-        // Check if the event does not exist
-        if (event.length === 0) {
-            console.log(`Event with ID ${eventID} not found.`);
-            return false;
+        const validationResult = validateEventCancellation(req, event, reason);
+        if (validationResult.status === 'error') {
+            return validationResult;
         }
 
-        // Log the event data for debugging purposes
-        console.log('Event found:', event[0]);
-
-        // Perform the update to cancel the event
         const result = await UPDATE(Events)
             .set({
                 IsCancelled: true,
@@ -261,38 +166,29 @@ module.exports = cds.service.impl(async function () {
             })
             .where({ ID: eventID });
 
-        // Check if the update was successful (no rows updated)
         if (result === 0) {
             console.log(`Failed to update event with ID ${eventID}.`);
-            return false;
+            return getErrorMessage(500, `Failed to update event with ID ${eventID}.`);
         }
 
         console.log(`Event with ID ${eventID} has been cancelled.`);
-        return true;
+        return getSuccessMessage(200, `Event with ID ${eventID} has been cancelled.`);
     });
 
-    /*
-     * reopenEvent:
-     * This action reopens a previously cancelled event by setting IsCancelled to false,
-     * IsActive to true, and clearing the CancellationReason. If the event doesn't exist 
-     * or isn't cancelled, it returns false.
+    /** 
+     * Action to reopen a cancelled event.
+     * Reverts the event status to active and clears the cancellation reason.
      */
     this.on('reopenEvent', async (req) => {
         const { eventID } = req.data;
 
-        // Limit the results to 1 and fetch the event
         const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
 
-        // Check if the event doesn't exist or isn't cancelled
-        if (event.length === 0 || !event[0].IsCancelled) {
-            console.log(`Event with ID ${eventID} not found or not cancelled.`);
-            return false;
+        const validationResult = validateEventReopening(req, event);
+        if (validationResult.status === 'error') {
+            return validationResult;
         }
 
-        // Log the event data for debugging purposes
-        console.log('Event found:', event[0]);
-
-        // Perform the update to reopen the event
         const result = await UPDATE(Events)
             .set({
                 IsCancelled: false,
@@ -301,13 +197,21 @@ module.exports = cds.service.impl(async function () {
             })
             .where({ ID: eventID });
 
-        // Check if the update was successful (no rows updated)
         if (result === 0) {
             console.log(`Failed to reopen event with ID ${eventID}.`);
-            return false;
+            return getErrorMessage(500, `Failed to reopen event with ID ${eventID}.`);
         }
 
         console.log(`Event with ID ${eventID} has been reopened.`);
-        return true;
+        return getSuccessMessage(200, `Event with ID ${eventID} has been reopened.`);
+    });
+
+    /** 
+     * Event handler before 'UPDATE' on 'Event' entity.
+     * Validates that the event's StartDate is not after EndDate.
+     */
+    this.before('UPDATE', 'Event', async (req) => {
+        const { StartDate, EndDate } = req.data;
+        validateEventDates(req, StartDate, EndDate);
     });
 });

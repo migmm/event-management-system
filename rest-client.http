@@ -3,8 +3,14 @@
 ######################################################
 
 
-### Base URL
-@api_base_url = http://localhost:4004/odata/v4/events-tickets/
+### Base URL and port
+@port=37391
+
+### Local test
+@api_base_url = http://localhost:{{port}}/odata/v4/management/
+
+### Uncomment this line below to test deployed application
+###@api_base_url = https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/
 
 
 
@@ -12,12 +18,12 @@
 ### EVENTS ###
 ##############
 
-### 1. Get all events
-GET http://localhost:4004/odata/v4/management/Events
+### Get all events
+GET {{api_base_url}}Events
 Accept: application/json
 
-### 2. Create a new event
-POST http://localhost:4004/odata/v4/management/Events
+### Create a new event
+POST {{api_base_url}}Events
 Content-Type: application/json
 
 {
@@ -31,16 +37,16 @@ Content-Type: application/json
   "CancellationReason": null
 }
 
-### 3. Update an event
-PATCH http://localhost:4004/odata/v4/management/Events(1)
+### Update an event
+PATCH {{api_base_url}}Events(1)
 Content-Type: application/json
 
 {
   "Description": "Updated description for Tech Conference 2024"
 }
 
-### 4. Delete an event
-DELETE http://localhost:4004/odata/v4/management/Events(1)
+### Delete an event
+DELETE {{api_base_url}}Events(1)
 
 
 
@@ -48,32 +54,32 @@ DELETE http://localhost:4004/odata/v4/management/Events(1)
 ### PARTICIPANTS ###
 ####################
 
-### 5. Get all participants
-GET http://localhost:4004/odata/v4/management/Participants
+### Get all participants
+GET {{api_base_url}}Participants
 Accept: application/json
 
-### 6. Create a participant
-POST http://localhost:4004/odata/v4/management/Participants
+### Create a participant
+POST {{api_base_url}}Participants
 Content-Type: application/json
 
 {
   "FirstName": "John",
   "LastName": "Doe",
-  "Email": "johndoe@example.com",
+  "Email": "johndoe@xample.com",
   "Phone": "123456789",
   "BusinessPartnerID": "1000000"
 }
 
-### 7. Update a participant (BusinessPartnerID cannot be changed)
-PATCH http://localhost:4004/odata/v4/management/Participants(1)
+### Update a participant (BusinessPartnerID cannot be changed)
+PATCH {{api_base_url}}Participants(1)
 Content-Type: application/json
 
 {
-  "Phone": "987654321"
+  "BusinessPartnerID": "987654321"
 }
 
-### 8. Delete a participant
-DELETE http://localhost:4004/odata/v4/management/Participants(2)
+### Delete a participant
+DELETE {{api_base_url}}Participants(1)
 
 
 
@@ -81,13 +87,13 @@ DELETE http://localhost:4004/odata/v4/management/Participants(2)
 ### CUSTOM LOGIC ###
 ####################
 
-### 8. Fetch Participant Details
-GET http://localhost:4004/odata/v4/management/fetchParticipantDetails(ParticipantID=7)
+### Fetch Participant Details
+GET {{api_base_url}}fetchParticipantDetails(ParticipantID=2)
 Accept: application/json
 
 
-### 9. Register a participant for an event
-POST http://localhost:4004/odata/v4/management/registerParticipant
+### Register a participant for an event
+POST {{api_base_url}}registerParticipant
 Content-Type: application/json
 
 {
@@ -95,8 +101,8 @@ Content-Type: application/json
   "participantID": 2
 }
 
-### 10. Cancel an event
-POST http://localhost:4004/odata/v4/management/cancelEvent
+### Cancel an event
+POST {{api_base_url}}cancelEvent
 Content-Type: application/json
 
 {
@@ -104,14 +110,166 @@ Content-Type: application/json
   "reason": "Weather conditions"
 }
 
-### 11. Reopen an event
-POST http://localhost:4004/odata/v4/management/reopenEvent
+### Reopen an event
+POST {{api_base_url}}reopenEvent
 Content-Type: application/json
 
 {
   "eventID": 2
 }
 
-### 12. Retrieve participants for a specific event
-GET http://localhost:4004/odata/v4/Management/getEventParticipants(eventID=2)
+### Retrieve participants for a specific event
+GET {{api_base_url}}getEventParticipants(eventID=2)
 Accept: application/json
+
+
+
+########################################
+### Wrong information to test errors ###
+########################################
+
+
+### Create a participant with existent email 
+### Use after created a participant before
+POST {{api_base_url}}Participants
+Content-Type: application/json
+
+{
+  "FirstName": "John",
+  "LastName": "Doe",
+  "Email": "johndoe@xample.com",
+  "Phone": "123456789",
+  "BusinessPartnerID": "1000000"
+}
+
+
+### Update a participant changing BusinessPartnerID
+PATCH {{api_base_url}}Participants(1)
+Content-Type: application/json
+
+{
+  "FirstName": "Charles",
+  "LastName": "Doe",
+  "Email": "johndoe@xample.com",
+  "Phone": "123456789",
+  "BusinessPartnerID": "1000200"
+}
+
+### Fetch Participant Details wiht an id that does not exist
+GET {{api_base_url}}fetchParticipantDetails(ParticipantID=1)
+Accept: application/json
+
+### Register a participant for an event that does not exist
+POST {{api_base_url}}registerParticipant
+Content-Type: application/json
+
+{
+  "eventID": 1,
+  "participantID": 2
+}
+
+### Cancel an event tahat does not exist
+POST {{api_base_url}}cancelEvent
+Content-Type: application/json
+
+{
+  "eventID": 2,
+  "reason": "Weather conditions"
+}
+
+### Reopen an event that does not exist
+POST {{api_base_url}}reopenEvent
+Content-Type: application/json
+
+{
+  "eventID": 2
+}
+
+
+########################################
+###      Extra data for adding       ###
+########################################
+
+### Participants
+###
+POST {{api_base_url}}Participants
+Content-Type: application/json
+
+{
+  "FirstName": "Linda",
+  "LastName": "Johnson",
+  "Email": "linda.johnson@email.com",
+  "Phone": "902709987",
+  "BusinessPartnerID": "1000000"
+}
+
+###
+POST {{api_base_url}}Participants
+Content-Type: application/json
+
+{
+  "FirstName": "Michael",
+  "LastName": "Jones",
+  "Email": "michael.jones@email.com",
+  "Phone": "813039790",
+  "BusinessPartnerID": "1000000"
+}
+
+###
+POST {{api_base_url}}Participants
+Content-Type: application/json
+
+{
+  "FirstName": "John",
+  "LastName": "Wilson",
+  "Email": "james.wilson@email.com",
+  "Phone": "698292056",
+  "BusinessPartnerID": "1000000"
+}
+
+
+### Events
+###
+POST {{api_base_url}}Events
+Content-Type: application/json
+
+{
+  "Name": "Marketing Summit",
+  "StartDate": "2024-07-01",
+  "EndDate": "2024-07-03",
+  "Location": "San Francisco",
+  "Description": "A summit dedicated to the world of e-commerce",
+  "IsActive": true,
+  "IsCancelled": false,
+  "CancellationReason": null
+}
+
+###
+POST {{api_base_url}}Events
+Content-Type: application/json
+
+{
+  "Name": "International HR Forum",
+  "StartDate": "2024-07-01",
+  "EndDate": "2024-07-03",
+  "Location": "Barcelona",
+  "Description": "A conference on media and entertainment technologies",
+  "IsActive": true,
+  "IsCancelled": false,
+  "CancellationReason": null
+}
+
+###
+POST {{api_base_url}}Events
+Content-Type: application/json
+
+{
+  "Name": "Virtual Reality Development Expo",
+  "StartDate": "2024-07-01",
+  "EndDate": "2024-07-03",
+  "Location": "Vancouver",
+  "Description": "An expo focused on VR and AR development",
+  "IsActive": true,
+  "IsCancelled": false,
+  "CancellationReason": null
+}
