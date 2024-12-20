@@ -3,8 +3,9 @@
 ######################################################
 
 
+
 ### Base URL and port
-@port=37391
+@port=4004
 
 ### Local test
 @api_base_url = http://localhost:{{port}}/odata/v4/management/
@@ -42,6 +43,10 @@ PATCH {{api_base_url}}Events(1)
 Content-Type: application/json
 
 {
+  "Name": "Tech Conference 2024",
+  "StartDate": "2024-07-01",
+  "EndDate": "2024-07-03",
+  "Location": "Seattle",
   "Description": "Updated description for Tech Conference 2024"
 }
 
@@ -75,7 +80,11 @@ PATCH {{api_base_url}}Participants(1)
 Content-Type: application/json
 
 {
-  "BusinessPartnerID": "987654321"
+  "FirstName": "John",
+  "LastName": "Doe",
+  "Email": "johndoe@xaplsess.com",
+  "Phone": "123456789",
+  "BusinessPartnerID": "1000000"
 }
 
 ### Delete a participant
@@ -142,6 +151,17 @@ Content-Type: application/json
   "BusinessPartnerID": "1000000"
 }
 
+### Create a participant with non-existent BusinessID
+POST {{api_base_url}}Participants
+Content-Type: application/json
+
+{
+  "FirstName": "John",
+  "LastName": "Doe",
+  "Email": "johndoe@xample.com",
+  "Phone": "123456789",
+  "BusinessPartnerID": "1"
+}
 
 ### Update a participant changing BusinessPartnerID
 PATCH {{api_base_url}}Participants(1)

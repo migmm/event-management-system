@@ -46,7 +46,7 @@ entity Participant : managed {
     message: 'The last name must be between 2 and 100 characters.' }
     LastName : String(100);
 
-    @mandatory @assert: { range: { min: 5, max: 100 }, 
+    @assert: { range: { min: 5, max: 100 }, 
     message: 'Insert a valid email.' }
     Email : String(150);
 
