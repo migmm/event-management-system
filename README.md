@@ -19,6 +19,8 @@ The API allows for the management of events and users. It provides CRUD operatio
 - Data was used from an external Business Partner API.
 - Custom routes were created in addition to the ones provided by CAP.
 - Validations were implemented for data entry.
+- Auto-generation of ID for the database, as in ID CAP mode there is no auto-increment feature.
+- The email was set as unique to test the errors thrown by CAP.
 - Custom endpoints implemented:
       registerParticipant
       getEventParticipants

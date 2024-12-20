@@ -19,6 +19,8 @@ La API permite la gestión de eventos y usuarios. Proporcionando operaciones CRU
 - Se uso información de una API externa de Business Partner.
 - Se crearon rutas custom ademas de las proporcionadas por CAP.
 - Se usaron validaciones en general para el ingreso de información.
+- Auto generacion de ID para la base de datos, ya que en modo ID CAP no tiene un auto incrementador
+- Se estableció el email como único para probar los errores arrojados por CAP
 - Rutas personalizadas implementadas:
       registerParticipant
       getEventParticipants

@@ -184,7 +184,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"FirstName\": \"John\",\n  \"LastName\": \"Doe\",\n  \"Email\": \"johndoe@xample.com\",\n  \"Phone\": \"123456789\",\n  \"BusinessPartnerID\": \"1000000\"\n}"
+							"raw": "{\n  \"FirstName\": \"Ed\",\n  \"LastName\": \"Harris\",\n  \"Email\": \"ed.harris@mail.com\",\n  \"Phone\": \"123456789\",\n  \"BusinessPartnerID\": \"1000000\"\n}"
 						},
 						"url": {
 							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants",
@@ -219,10 +219,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"FirstName\": \"John\",\n  \"LastName\": \"Doe\",\n  \"Email\": \"johndoe@xaplsess.com\",\n  \"Phone\": \"123456789\",\n  \"BusinessPartnerID\": \"1000000\"\n}"
+							"raw": "{\n    \"FirstName\": \"Bill\",\n    \"LastName\": \"Hudson\",\n    \"Email\": \"bill.hudson@newmail.com\",\n    \"Phone\": \"123456789\",\n    \"BusinessPartnerID\": \"1000000\"\n}"
 						},
 						"url": {
-							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants(1)",
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants(4)",
 							"protocol": "https",
 							"host": [
 								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
@@ -236,7 +236,7 @@
 								"odata",
 								"v4",
 								"management",
-								"Participants(1)"
+								"Participants(4)"
 							]
 						}
 					},
@@ -681,6 +681,37 @@
 								"v4",
 								"management",
 								"reopenEvent"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Business Partner ID",
+			"item": [
+				{
+					"name": "Get business partner information through this API",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/BusinessPartners",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"BusinessPartners"
 							]
 						}
 					},
