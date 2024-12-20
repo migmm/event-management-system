@@ -11,7 +11,7 @@ const {
     validateEventReopening
 } = require('./utils/validations');
 const { getErrorMessage } = require('./utils/errorMessages');
-const { getSuccessMessage } = require('./utils/successMessages');
+const { getSuccessMessage } = require('./utils/sucessMessages');
 
 module.exports = cds.service.impl(async function () {
     const {
@@ -52,6 +52,17 @@ module.exports = cds.service.impl(async function () {
                 .where({ BusinessPartner: BusinessPartnerID })
         );
         if (!bpExists) req.reject(404, `Business Partner with ID ${BusinessPartnerID} does not exist.`);
+
+        const email = req.data.Email;
+        const phone = req.data.Phone;
+
+        validateEmailAndPhone(req, email, phone);
+
+        const existingParticipant = await SELECT.one.from(Participants).where({ Email: email });
+
+        if (existingParticipant) {
+            req.error(400, 'Email already exists');
+        }
     });
 
     /** 
@@ -65,27 +76,6 @@ module.exports = cds.service.impl(async function () {
         const { StartDate, EndDate } = req.data;
 
         validateEventDates(req, StartDate, EndDate);
-    });
-
-    /** 
-     * Event handler before 'CREATE' on the 'Participants' entity.
-     * Validates email and phone number format, and checks for duplicate emails.
-     */
-    this.before('CREATE', 'Participants', async (req) => {
-        const tableName = req.target.name;
-        const newID = await getNextId(tableName);
-        req.data.ID = newID;
-
-        const email = req.data.Email;
-        const phone = req.data.Phone;
-
-        validateEmailAndPhone(req, email, phone);
-
-        const existingParticipant = await SELECT.one.from(Participants).where({ Email: email });
-
-        if (existingParticipant) {
-            req.error(400, 'Email already exists');
-        }
     });
 
     /** 
