@@ -1,0 +1,692 @@
+{
+	"info": {
+		"_postman_id": "ae81475d-03f4-4ffb-9f60-6cfee76c5cd0",
+		"name": "Event Management API",
+		"description": "API for Event Management with CRUD operations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Events",
+			"item": [
+				{
+					"name": "Get all events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Events",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Name\": \"Tech Conference 2024\",\n  \"StartDate\": \"2024-07-01\",\n  \"EndDate\": \"2024-07-03\",\n  \"Location\": \"New York City\",\n  \"Description\": \"Annual Technology Conference\",\n  \"IsActive\": true,\n  \"IsCancelled\": false,\n  \"CancellationReason\": null\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Events",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update an event",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Name\": \"Tech Conference 2024\",\n  \"StartDate\": \"2024-07-01\",\n  \"EndDate\": \"2024-07-03\",\n  \"Location\": \"New York City\",\n  \"Description\": \"Updated description for Tech Conference 2024\"\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Events(1)",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Events(1)"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an event",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Events(1)",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Events(1)"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Participants",
+			"item": [
+				{
+					"name": "Get all participants",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Participants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a participant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"FirstName\": \"John\",\n  \"LastName\": \"Doe\",\n  \"Email\": \"johndoe@xample.com\",\n  \"Phone\": \"123456789\",\n  \"BusinessPartnerID\": \"1000000\"\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Participants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a participant",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"FirstName\": \"John\",\n  \"LastName\": \"Doe\",\n  \"Email\": \"johndoe@xaplsess.com\",\n  \"Phone\": \"123456789\",\n  \"BusinessPartnerID\": \"1000000\"\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants(1)",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Participants(1)"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a participant",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants(1)",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Participants(1)"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Custom Logic",
+			"item": [
+				{
+					"name": "Fetch Participant Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/fetchParticipantDetails(ParticipantID=2)",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"fetchParticipantDetails(ParticipantID=2)"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register a participant for an event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eventID\": 2,\n  \"participantID\": 2\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/registerParticipant",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"registerParticipant"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel an event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eventID\": 2,\n  \"reason\": \"Weather conditions\"\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/cancelEvent",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"cancelEvent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reopen an event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eventID\": 2\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/reopenEvent",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"reopenEvent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve participants for a specific event",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/getEventParticipants(eventID=2)",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"getEventParticipants(eventID=2)"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Test Errors",
+			"item": [
+				{
+					"name": "Create a participant with existent email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"FirstName\": \"John\",\n  \"LastName\": \"Doe\",\n  \"Email\": \"johndoe@xample.com\",\n  \"Phone\": \"123456789\",\n  \"BusinessPartnerID\": \"1000000\"\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Participants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a participant with unexistent BusinessPartner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"FirstName\": \"John\",\n  \"LastName\": \"Doe\",\n  \"Email\": \"johndoe@xample.com\",\n  \"Phone\": \"123456789\",\n  \"BusinessPartnerID\": \"10\"\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Participants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a participant changing BusinessPartnerID",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"FirstName\": \"Charles\",\n  \"LastName\": \"Doe\",\n  \"Email\": \"johndoe@xample.com\",\n  \"Phone\": \"123456789\",\n  \"BusinessPartnerID\": \"1000200\"\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/Participants(1)",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"Participants(1)"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Participant Details with non-existent ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/fetchParticipantDetails(ParticipantID=500)",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"fetchParticipantDetails(ParticipantID=500)"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register a participant for a non-existent event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eventID\": 500,\n  \"participantID\": 2\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/registerParticipant",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"registerParticipant"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel a non-existent event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eventID\": 500,\n  \"reason\": \"Weather conditions\"\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/cancelEvent",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"cancelEvent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reopen a non-existent event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eventID\": 500\n}"
+						},
+						"url": {
+							"raw": "https://2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd.cfapps.us10-001.hana.ondemand.com/odata/v4/management/reopenEvent",
+							"protocol": "https",
+							"host": [
+								"2fda7038trial-trial-spnpjyiq-events-man-event-managemen5a33b8dd",
+								"cfapps",
+								"us10-001",
+								"hana",
+								"ondemand",
+								"com"
+							],
+							"path": [
+								"odata",
+								"v4",
+								"management",
+								"reopenEvent"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
