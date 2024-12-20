@@ -6,6 +6,7 @@ const {
     validateEmailAndPhone,
     validateBusinessPartnerID,
     validateEventStatus,
+    validateEventExists,
     validateParticipantExists,
     validateEventCancellation,
     validateEventReopening
@@ -99,6 +100,29 @@ module.exports = cds.service.impl(async function () {
         validateEmailAndPhone(req, email, phone);
     });
 
+    /** 
+     * Action to validate event and participant.
+     * Verifies if the event is active or exist, and checks if the participant exists.
+     */
+  this.before('getEventParticipants', async (req) => {
+        const { eventID } = req.data;
+        const { participantID } =req.data;
+        const event = await SELECT.from(Events).where({ ID: eventID }).limit(1);
+
+        validateEventExists(req, event) 
+
+        validateParticipantExists(req, participantID)
+
+        console.log('Event found:', event[0]);
+
+        const participants = await SELECT.from(Participants).where({ Event_ID: eventID });
+
+        console.log(`Found ${participants.length} participants for event with ID ${eventID}.`);
+
+        return participants;
+    });
+
+    
     /** 
      * Action to register a participant for an event.
      * Verifies if the event is active, and checks if the participant exists.
