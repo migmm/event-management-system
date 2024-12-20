@@ -11,15 +11,20 @@ Este proyecto es parte del un *Entregable del Bootcamp SAP CAP de Globant.*
 
 El entregable consiste en entregar un proyecto realizado en SAP CAP y deployado en Cloud Foundry de acuerdo a una serie de requerimientos.
 
-La API permite la gestión de eventos y usuarios. Proporcionando operaciones CRUD para cada entidad e incluye endpoints personalizados para.
+La API permite la gestión de eventos y usuarios. Proporcionando operaciones CRUD para cada entidad e incluye endpoints personalizados.
 
 ## Características
 
-- Se hicieron uso de actins y functions dependiendo del requerimiento.
+- Se hicieron uso de actions y functions dependiendo del requerimiento.
 - Se uso información de una API externa de Business Partner.
 - Se crearon rutas custom ademas de las proporcionadas por CAP.
 - Se usaron validaciones en general para el ingreso de información.
-
+- Rutas personalizadas implementadas:
+      registerParticipant
+      getEventParticipants
+      cancelEvent
+      reopenEvent
+      fetchParticipantDetails
 
 ## Requisitos
 
@@ -79,7 +84,6 @@ Las verificaciones se realziaron de acuerdo a lo requerido, ej: si el participan
 ## Requests
 
 A continuación se muestran los requests con datos que funcionan, omitiendo los request que generarían mensajes de error, estos request con datos erroneos están incluídos tanto en [archivo HTTP](rest-client.http) como en la [colección postman](Event%20Management%20API.postman_collection.json) para ser testeados.
-
 
 #### URL base y puerto
 ```sh
@@ -245,3 +249,13 @@ Los mensajes de error como los de sucess fueron formateados igual al formato est
 ## Fuentes
 
 https://community.sap.com/t5/technology-q-a/error-during-request-to-remote-service-failed-to-load-destination/qaq-p/13773565
+
+https://api.sap.com/api/API_BUSINESS_PARTNER/resource/Business_Partner
+
+https://developers.sap.com/tutorials/spa-consume-actions-cap-setupenv..html
+
+https://cap.cloud.sap/docs/guides/using-services
+
+https://community.sap.com/t5/technology-blogs-by-sap/understanding-entity-relationships-in-cds/ba-p/13552921
+
+https://developers.sap.com/mission.hana-cloud-cap.html
